@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.files = ["lib/nagios-gearman-external-cmd.rb"]
   s.add_dependency 'ruby-gearman'
   s.add_dependency 'thor'
-  
+  s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   # s.extra_rdoc_files = ['README.md', 'LICENSE']
   s.license = 'MIT'
 end

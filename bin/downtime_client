@@ -7,11 +7,45 @@ require "thor"
 
 class Downtime < Thor
 
-  default_task 'send_downtime'
+  default_task 'show_help'
 
-  desc "send_downtime", "Send Downtime request to Gearman server - downtime queue"
+  desc "show_help", 'Display help for downtime client'
 
-  method_option :gearman_server, :desc => 'Gearman server address', :required => true
+  def show_help
+    puts <<-HELP
+
+Usage:
+  downtime_client set --duration=duration in minutes --gearman-server=Gearman server address
+
+  --object_type [host, 
+                 hostgroup_host, 
+                 hostgroup_svc, 
+                 servicegroup_host, 
+                 servicegroup_svc,
+                 service,
+                 enable_servicegroup,
+                 disable_servicegroup], default => host
+
+  --object_name  default => 'hostname -f', the name of the object type
+
+
+  --encryption true/false - default => false
+  --key Key to encrypt request - must be identical to the gearman_server key
+  --queue gearman server queue default => downtime
+
+
+  --start_time  default => now
+  --end_time    default => now + duration
+  --duration    time in minutes, default => 1 minute
+
+  --author    Author of downtime (default hostname) 
+  --comment   default => 'Downtime recieved by gearman server'
+    HELP
+  end
+
+  desc "set", "Send Downtime request to Gearman server - downtime queue"
+
+  method_option :gearman_server, :banner => 'Gearman server address', :desc => 'Gearman server address', :required => true
   method_option :gearman_port,   :desc => 'Gearman server port',                                                     :default => '4730'
   method_option :encryption,     :desc => 'Enable encryption of request( true / false)', :type => 'boolean',         :default => false
   method_option :key,            :desc => 'Key to encrypt request - must be identical to the gearman_server key',    :default => ''
@@ -21,15 +55,16 @@ class Downtime < Thor
   method_option :object_name,    :desc => 'Name of the object in nagios - default to hostname -f ',                  :default => `hostname -f`.chomp
   method_option :start_time,     :desc => 'Downtime start_time in epoch - default now',                              :default => Time.now.to_i
   method_option :end_time,       :desc => 'Downtime end_time in epoch - default now',                                :default => Time.now.to_i 
-  method_option :duration,       :desc => 'duration of downtime in minutes', :required => true                                         
+  method_option :duration, :banner => 'duration in minutes',      :desc => 'duration of downtime in minutes', :required => true                                         
   method_option :fixed,          :desc => 'downtime start and end is fixed',                                         :default => 1
   method_option :author,         :desc => 'Author of downtime (default hostname)',                                   :default => `hostname -f`.chomp
   method_option :comment,        :desc => 'Comment for downtime',                                                    :default => 'Downtime recieved by gearman server'
   method_option :trigger_id,     :desc => 'triggered by the ID of another scheduled downtime entry',                 :default => 0
 
-  def send_downtime
+  def set
 
-    options[:duration] = options[:duration] * 60
+    duration_interval = options[:duration] 
+    duration = duration_interval * 60
     options[:end_time] = Time.now.to_i + options[:duration]
 
     args = {
@@ -41,7 +76,7 @@ class Downtime < Thor
       :object_name        => options[:object_name],
       :start_time         => options[:start_time],
       :end_time           => options[:end_time],
-      :duration           => options[:duration],
+      :duration           => duration,
       :fixed              => options[:fixed],
       :author             => options[:author],
       :comment            => options[:comment],
