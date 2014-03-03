@@ -3,12 +3,10 @@ Gem::Specification.new do |s|
   s.version     = '0.1.0'
   s.authors     = ["Ami Mahloof"]
   s.email       = "ami.mahloof@gmail.com"
-  s.homepage    = "TODO HOMEPAGE"
+  s.homepage    = "https://github.com/gtforge/nagios-gearman-downtime"
   s.summary     = "Send external commands to mod-gearman"
-  s.description = "TODO DESCRIPTION"
-  s.required_rubygems_version = ">= 1.3.6"
-  s.files = ["lib/nagios-gearman-external-cmd.rb"]
-  s.add_dependency 'ruby-gearman'
+  s.description = "Gearman Client & Worker for sending downtime and enable / disable notifications for service groups"
+  s.add_dependency 'gearman-ruby'
   s.add_dependency 'thor'
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   # s.extra_rdoc_files = ['README.md', 'LICENSE']

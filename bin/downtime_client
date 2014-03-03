@@ -49,12 +49,10 @@ Usage:
   method_option :gearman_port,   :desc => 'Gearman server port',                                                     :default => '4730'
   method_option :encryption,     :desc => 'Enable encryption of request( true / false)', :type => 'boolean',         :default => false
   method_option :key,            :desc => 'Key to encrypt request - must be identical to the gearman_server key',    :default => ''
-  method_option :queue,          :desc => 'Gearman queue',                                                           :default => 'downtime'
-
   method_option :object_type,    :desc => 'Object type in nagios',:enum => %w{ host hostgroup_host hostgroup_svc servicegroup_host servicegroup_svc service enable_servicegroup disable_servicegroup}, :default => 'host'
   method_option :object_name,    :desc => 'Name of the object in nagios - default to hostname -f ',                  :default => `hostname -f`.chomp
   method_option :start_time,     :desc => 'Downtime start_time in epoch - default now',                              :default => Time.now.to_i
-  method_option :end_time,       :desc => 'Downtime end_time in epoch - default now',                                :default => Time.now.to_i 
+  method_option :end_time,       :desc => 'Downtime end_time in epoch - default now'                                
   method_option :duration, :banner => 'duration in minutes',      :desc => 'duration of downtime in minutes', :required => true                                         
   method_option :fixed,          :desc => 'downtime start and end is fixed',                                         :default => 1
   method_option :author,         :desc => 'Author of downtime (default hostname)',                                   :default => `hostname -f`.chomp
@@ -63,19 +61,20 @@ Usage:
 
   def set
 
-    duration_interval = options[:duration] 
-    duration = duration_interval * 60
-    options[:end_time] = Time.now.to_i + options[:duration]
+    
+    duration = options[:duration].to_i * 60
+    puts "duration: #{duration}"
+    end_time = options[:end_time] || Time.now.to_i + duration
 
     args = {
       :gearman_job_server => ["#{options[:gearman_server]}:#{options[:gearman_port] || 4730}"],
       :encryption         => options[:encryption],
       :key                => options[:key],
-      :queue              => options[:queue],
+      :queue              => 'downtime',
       :object_type        => options[:object_type],
       :object_name        => options[:object_name],
       :start_time         => options[:start_time],
-      :end_time           => options[:end_time],
+      :end_time           => end_time,
       :duration           => duration,
       :fixed              => options[:fixed],
       :author             => options[:author],
