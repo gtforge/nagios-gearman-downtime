@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "nagios-gearman-downtime"
-  s.version     = '0.1.0'
+  s.version     = '1.0.0'
   s.authors     = ["Ami Mahloof"]
   s.email       = "ami.mahloof@gmail.com"
   s.homepage    = "https://github.com/gtforge/nagios-gearman-downtime"
