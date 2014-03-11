@@ -1,0 +1,10 @@
+downtime_worker = `which downtime_worker`
+Bluepill.application("downtime_worker", :log_file => "/var/log/bluepill-downtime_worker.log") do |app|
+  app.process("downtime_worker") do |process|
+    process.start_command      = "#{downtime_worker}"
+    process.stop_command       = "kill -QUIT {{PID}}"
+    process.restart_command    = "kill -HUP {{PID}}"
+    process.stdout             = process.stderr = "/var/log/bluepill-downtime_worker.log"
+    process.daemonize          = true
+  end
+end

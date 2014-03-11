@@ -3,7 +3,7 @@ require 'gearman'
 require 'base64'
 require "openssl"
 require "thor"
-require "../lib/nagios-gearman-downtime"
+require "nagios-gearman-downtime"
 
 class Downtime < Thor
 

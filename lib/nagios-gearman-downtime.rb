@@ -1,6 +1,6 @@
 module Nagios
   module Gearman
-    class Downtime
+    module Downtime
 
       def self.create_object_type(obj, obj_name)
         case obj
