@@ -3,7 +3,12 @@ module Nagios
     module Downtime
 
       def self.log
-        @@logger = Logger.new('/var/log/downtime_worker.log')
+        @@logger = 
+        begin          
+          Logger.new('/var/log/downtime_worker.log')
+         rescue Exception => e
+          Logger.new(STDOUT)
+         end
         @@logger.level = Logger::DEBUG
         @@logger        
       end
