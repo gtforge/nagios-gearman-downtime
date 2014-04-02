@@ -2,6 +2,8 @@ module Nagios
   module Gearman
     module Downtime
 
+      @@logger = Logger.new('/var/log/downtime_worker.log')
+      @@logger.level = Logger::DEBUG
       def self.create_object_type(obj, obj_name)
         case obj
         when 'host' 
@@ -21,6 +23,7 @@ module Nagios
         when 'disable_servicegroup'
           object_info = "DISABLE_SERVICEGROUP_SVC_NOTIFICATIONS;#{obj_name}"
         end
+        @@logger.info("object_info: #{object_info}")
       end
 
 
@@ -34,6 +37,7 @@ module Nagios
         end
         
         payload = "[#{Time.now.to_i}] #{object_info};#{common_args}"
+        @@logger.info("payload before encryption: #{payload}")
 
         if args.delete(:encryption)
           begin
@@ -46,16 +50,17 @@ module Nagios
       end
 
       def self.send_external_cmd(options)
-        puts "send_external_cmd options: #{options}"
+        @@logger.info "send_external_cmd options: #{options}"
         client  = ::Gearman::Client.new(options[:gearman_job_server])
         taskset = ::Gearman::TaskSet.new(client)
         encoded_job = Base64.encode64(options[:job])
         task = ::Gearman::Task.new(options[:queue], encoded_job) 
         begin
-          puts "[client] Sending task: #{task.inspect}"
+          @@logger.info "[client] Sending task: #{task.inspect}"
           result = taskset.add_task(task)
+          @@logger.info("result: #{resault}")
         rescue Exception => e
-          "Send external command failed: #{e}"
+          @@logger.error "Send external command failed: #{e}"
         end
       end
 
