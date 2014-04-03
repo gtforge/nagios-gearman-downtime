@@ -61,7 +61,7 @@ Usage:
 
   def set   
     duration = options[:duration].to_i * 60
-    puts "duration: #{duration}"
+    ::Nagios::Gearman::Downtime.logger.info "duration in seconds: #{duration}"
     end_time = options[:end_time] || Time.now.to_i + duration
 
     args = {
