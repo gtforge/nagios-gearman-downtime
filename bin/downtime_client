@@ -49,14 +49,14 @@ Usage:
   method_option :gearman_port,   :desc => 'Gearman server port',                                                     :default => '4730'
   method_option :encryption,     :desc => 'Enable encryption of request( true / false)', :type => 'boolean',         :default => false
   method_option :key,            :desc => 'Key to encrypt request - must be identical to the gearman_server key',    :default => ''
-  method_option :object_type,    :desc => 'Object type in nagios',:enum => %w{ host hostgroup_host hostgroup_svc servicegroup_host servicegroup_svc service enable_servicegroup disable_servicegroup}, :default => 'host'
+  method_option :object_type,    :desc => 'Object type in nagios',:enum => %w{ host service hostgroup_host hostgroup_svc servicegroup_host servicegroup_svc enable_servicegroup disable_servicegroup}, :default => 'host'
   method_option :object_name,    :desc => 'Name of the object in nagios - default to hostname -f ',                  :default => `hostname -f`.chomp
   method_option :start_time,     :desc => 'Downtime start_time in epoch - default now',                              :default => Time.now.to_i
   method_option :end_time,       :desc => 'Downtime end_time in epoch - default now'                                
   method_option :duration, :banner => 'duration in minutes',      :desc => 'duration of downtime in minutes', :required => true                                         
-  method_option :fixed,          :desc => 'downtime start and end is fixed',                                         :default => 1
+  method_option :fixed,          :desc => 'downtime start and end is fixed - default is flexible',                                         :default => 0
   method_option :author,         :desc => 'Author of downtime (default hostname)',                                   :default => `hostname -f`.chomp
-  method_option :comment,        :desc => 'Comment for downtime',                                                    :default => 'Downtime recieved by gearman server'
+  method_option :comment,        :desc => 'Comment for downtime',                                                    :default => "Downtime recieved by gearman server at #{Time.now}"
   method_option :trigger_id,     :desc => 'triggered by the ID of another scheduled downtime entry',                 :default => 0
 
   def set   
@@ -80,7 +80,6 @@ Usage:
       :trigger_id         => options[:trigger_id]
     }
 
-    
     args.merge!(:job => ::Nagios::Gearman::Downtime.build_payload(args))
 
     ::Nagios::Gearman::Downtime.send_external_cmd(args)
